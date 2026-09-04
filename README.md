@@ -93,6 +93,26 @@ pnpm db:down          # revert last migration
 pnpm db:seed          # seed local roles and users
 ```
 
+## Project structure
+
+```text
+src/
+├── main.ts                     # HTTP, CORS, validation, Redis sessions, Passport
+├── app.module.ts               # root modules, logging, mail, throttling, global guards
+├── modules/
+│   ├── auth/                   # sessions, local/Google auth, password flows
+│   ├── database/               # TypeORM configuration, migrations, seeds
+│   ├── roles/                  # role administration
+│   ├── stats/                  # administration totals
+│   └── users/                  # users, avatars, CSV import/export
+└── shared/
+    ├── abstracts/              # common entity and controller bases
+    ├── helpers/                # pagination, uploads, CSV, email templates
+    └── interfaces/             # shared contracts
+```
+
+Feature modules follow CQRS and barrel exports. Reads live under `queries`, writes under `commands`, and side effects may use `events`. Controllers, DTOs, entities, interfaces, and reusable helpers remain in their dedicated folders. Cross-module data access is performed through the owning module's queries or commands rather than by injecting another module's repository.
+
 ## Runtime Notes
 
 - Requests are validated with a global `ValidationPipe` using `transform: true`.
