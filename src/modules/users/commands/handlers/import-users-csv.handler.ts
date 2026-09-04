@@ -14,7 +14,7 @@ export class ImportUsersCsvHandler implements ICommandHandler<ImportUsersCsv, vo
       const rows = await parseUsersCsv(command.file.buffer);
 
       for (const row of rows) {
-        await this.commandBus.execute(new FindOrCreateUser(row.email, row.name, row.password, row.avatar, row.roles));
+        await this.commandBus.execute(new FindOrCreateUser(row));
       }
     } catch (error) {
       if (error instanceof NotFoundException) throw error;

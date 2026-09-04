@@ -19,7 +19,7 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUser, IUserRespo
   ) {}
 
   async execute(command: UpdateUser): Promise<IUserResponse> {
-    const { email, name, password, avatar, roles } = command;
+    const { email, name, password, avatar, roles } = command.updateUserDto;
 
     try {
       const user = await this.repository.findOneOrFail({ where: { email } });

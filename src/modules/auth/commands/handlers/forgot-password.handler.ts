@@ -18,7 +18,7 @@ export class ForgotPasswordHandler implements ICommandHandler<ForgotPassword, vo
   ) {}
 
   async execute(command: ForgotPassword): Promise<void> {
-    const { email } = command;
+    const { email } = command.forgotPasswordDto;
 
     try {
       const user = await this.queryBus.execute(new FindUserByEmail(email));
@@ -32,7 +32,9 @@ export class ForgotPasswordHandler implements ICommandHandler<ForgotPassword, vo
 
       this.eventBus.publish(new ResetPasswordRequestedEvent(user, link));
     } catch (error) {
-      this.logger.error(`Forgot password failed email="${email}": ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.error(
+        `Forgot password failed email="${email}": ${error instanceof Error ? error.message : String(error)}`
+      );
       throw new BadRequestException('Demande invalide');
     }
   }

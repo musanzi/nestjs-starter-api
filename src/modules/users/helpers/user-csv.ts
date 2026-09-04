@@ -1,6 +1,6 @@
 import { Readable } from 'stream';
 import { parse } from 'fast-csv';
-import { CreateUserDto } from '../dto/create-user.dto';
+import { CreateUserDto } from '../dto';
 
 export function parseUsersCsv(buffer: Buffer): Promise<CreateUserDto[]> {
   return new Promise((resolve, reject) => {

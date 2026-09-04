@@ -15,10 +15,10 @@ export class SignUpHandler implements ICommandHandler<SignUp, IUserResponse> {
   ) {}
 
   async execute(command: SignUp): Promise<IUserResponse> {
-    const { name, email, password } = command;
+    const { name, email, password } = command.signUpDto;
 
     try {
-      const user = await this.commandBus.execute(new CreateUser(email, name, password));
+      const user = await this.commandBus.execute(new CreateUser({ email, name, password }));
 
       return await this.queryBus.execute(new FindUserById(user.id));
     } catch (error) {

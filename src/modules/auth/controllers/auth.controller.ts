@@ -3,11 +3,8 @@ import { Request, Response } from 'express';
 import { AbstractController } from '@/shared/abstracts';
 import { User } from '../../users/entities/user.entity';
 import { IUserResponse } from '../../users/interfaces';
-import { UpdateUserDto } from '../../users/dto/update-user.dto';
-import { SignUpDto } from '../dto/sign-up.dto';
-import { UpdatePasswordDto } from '@/modules/auth/dto/update-password.dto';
-import { ForgotPasswordDto } from '@/modules/auth/dto/forgot-password.dto';
-import { ResetPasswordDto } from '@/modules/auth/dto/reset-password.dto';
+import { UpdateUserDto } from '../../users/dto';
+import { ForgotPasswordDto, ResetPasswordDto, SignUpDto, UpdatePasswordDto } from '../dto';
 import { Public } from '../decorators/public.decorator';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { GoogleAuthGuard } from '../guards/google-auth.guard';
@@ -20,7 +17,7 @@ export class AuthController extends AbstractController {
   @Post('signup')
   @Public()
   signUp(@Body() dto: SignUpDto): Promise<IUserResponse> {
-    return this.commandHandler.execute(new SignUp(dto.name, dto.email, dto.password));
+    return this.commandHandler.execute(new SignUp(dto));
   }
 
   @Post('signin')
@@ -54,25 +51,23 @@ export class AuthController extends AbstractController {
 
   @Patch('me/update')
   updateProfile(@CurrentUser() user: User, @Body() dto: UpdateUserDto): Promise<IUserResponse> {
-    return this.commandHandler.execute(
-      new UpdateProfile(user, dto.email, dto.name, dto.password, dto.avatar, dto.roles)
-    );
+    return this.commandHandler.execute(new UpdateProfile(user, dto));
   }
 
   @Patch('password/update')
   updatePassword(@CurrentUser() user: User, @Body() dto: UpdatePasswordDto): Promise<IUserResponse> {
-    return this.commandHandler.execute(new UpdatePassword(user, dto.password));
+    return this.commandHandler.execute(new UpdatePassword(user, dto));
   }
 
   @Post('password/forgot')
   @Public()
   forgotPassword(@Body() dto: ForgotPasswordDto): Promise<void> {
-    return this.commandHandler.execute(new ForgotPassword(dto.email));
+    return this.commandHandler.execute(new ForgotPassword(dto));
   }
 
   @Post('password/reset')
   @Public()
   resetPassword(@Body() dto: ResetPasswordDto): Promise<IUserResponse> {
-    return this.commandHandler.execute(new ResetPassword(dto.token, dto.password));
+    return this.commandHandler.execute(new ResetPassword(dto));
   }
 }

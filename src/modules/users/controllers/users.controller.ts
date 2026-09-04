@@ -14,9 +14,8 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AbstractController } from '@/shared/abstracts';
 import { createCsvUploadOptions } from '@/shared/helpers';
-import { CreateUserDto } from '../dto/create-user.dto';
+import { CreateUserDto, UpdateUserDto } from '../dto';
 import { IFilterUsers, IUserResponse } from '../interfaces';
-import { UpdateUserDto } from '../dto/update-user.dto';
 import { User } from '../entities/user.entity';
 import { CurrentUser, HasRoles } from '@/modules/auth/decorators';
 import { Roles } from '@/modules/auth/enums';
@@ -30,7 +29,7 @@ export class UsersController extends AbstractController {
   @Post()
   @HasRoles([Roles.ADMIN])
   create(@Body() dto: CreateUserDto): Promise<IUserResponse> {
-    return this.commandHandler.execute(new CreateUser(dto.email, dto.name, dto.password, dto.avatar, dto.roles));
+    return this.commandHandler.execute(new CreateUser(dto));
   }
 
   @Get()
@@ -67,7 +66,7 @@ export class UsersController extends AbstractController {
   @Patch(':id')
   @HasRoles([Roles.ADMIN])
   update(@Param('id') id: string, @Body() dto: UpdateUserDto): Promise<IUserResponse> {
-    return this.commandHandler.execute(new UpdateUser(id, dto.email, dto.name, dto.password, dto.avatar, dto.roles));
+    return this.commandHandler.execute(new UpdateUser(id, dto));
   }
 
   @Delete(':id')

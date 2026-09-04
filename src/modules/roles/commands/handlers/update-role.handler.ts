@@ -17,11 +17,11 @@ export class UpdateRoleHandler implements ICommandHandler<UpdateRole, Role> {
   ) {}
 
   async execute(command: UpdateRole): Promise<Role> {
-    const { id, name } = command;
+    const { id, updateRoleDto } = command;
 
     try {
       const role = await this.queryBus.execute(new FindRoleById(id));
-      const updatedRole = this.repository.merge(role, { name });
+      const updatedRole = this.repository.merge(role, updateRoleDto);
 
       return await this.repository.save(updatedRole);
     } catch (error) {
