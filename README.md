@@ -36,88 +36,6 @@ NestJS API starter for session-based authentication, Google OAuth, role-based ac
 - pnpm
 - PostgreSQL, or Docker for the containerized stack
 
-## Setup
-
-Install dependencies and create a local environment file:
-
-```bash
-pnpm install
-cp .env.example .env
-```
-
-Configure `.env`:
-
-```env
-PORT=8000
-
-DB_HOST=localhost
-DB_PORT=5432
-DB_USERNAME=
-DB_PASSWORD=
-DB_NAME=
-
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=465
-MAIL_USERNAME=
-MAIL_PASSWORD=
-
-SESSION_SECRET=
-SESSION_MAX_AGE=
-
-JWT_SECRET=
-JWT_AUTH_TOKEN_EXPIRERS_IN=
-
-GOOGLE_CLIENT_ID=
-GOOGLE_SECRET=
-GOOGLE_REDIRECT_URI=
-FRONTEND_URI=
-ADMIN_URI=
-```
-
-Run the API locally against a PostgreSQL instance on your machine:
-
-```bash
-pnpm build
-pnpm db:up
-pnpm db:seed
-pnpm start:dev
-```
-
-The API listens on `PORT`, or `3000` when `PORT` is not set. Use `DB_HOST=localhost` when running the API directly on your machine.
-
-Seed credentials for local development:
-
-- `admin@admin.com` / `admin1234`
-- `user@user.com` / `user1234`
-
-The seed script refuses to run when `NODE_ENV=production`.
-
-## Database
-
-TypeORM CLI commands use `src/modules/database/orm.config.ts`. The current data source loads compiled entities and migrations from `dist/`, so build before running database commands.
-
-Generate a migration after entity changes:
-
-```bash
-pnpm build
-name=my_migration pnpm db:migrate
-```
-
-Apply or revert migrations:
-
-```bash
-pnpm db:up
-pnpm db:down
-```
-
-Seed local roles and users:
-
-```bash
-pnpm db:seed
-```
-
-Database synchronization is disabled.
-
 ## Docker
 
 This repo has separate Compose files for development and production:
@@ -130,7 +48,7 @@ Both Compose files run PostgreSQL with `postgres:18-alpine`, read `.env`, requir
 Start the development stack:
 
 ```bash
-docker compose -f compose.dev.yml up --build
+docker compose -f compose.dev.yml -p starter-backend up --build
 ```
 
 The API is available on `http://localhost:$PORT`. Adminer is available on `http://localhost:8080`.
@@ -138,22 +56,21 @@ The API is available on `http://localhost:$PORT`. Adminer is available on `http:
 Run migrations and seeds in the development API container:
 
 ```bash
-docker compose -f compose.dev.yml run --rm api pnpm build
-docker compose -f compose.dev.yml run --rm api pnpm db:up
-docker compose -f compose.dev.yml run --rm api pnpm db:seed
+docker compose -f compose.dev.yml -p starter-backend exec api pnpm build
+docker compose -f compose.dev.yml -p starter-backend exec api pnpm db:migrate
+docker compose -f compose.dev.yml -p starter-backend exec api pnpm db:up
+docker compose -f compose.dev.yml -p starter-backend exec api pnpm db:seed
 ```
+
+Seed credentials for local development:
+
+- `admin@admin.com` / `admin1234`
+- `user@user.com` / `user1234`
 
 Start the production-style stack:
 
 ```bash
-docker compose -f compose.prod.yml up --build
-```
-
-Build Docker targets directly:
-
-```bash
-docker build --target development .
-docker build --target production .
+docker compose -f compose.prod.yml -p starter-backend up --build
 ```
 
 ## Scripts
@@ -229,63 +146,3 @@ Protected routes require an authenticated session. Admin routes require the `adm
 ### Stats
 
 - `GET /stats` admin, returns user and role totals as `{ label, total }` items
-
-## Project Layout
-
-```text
-.
-  Dockerfile                    # multi-stage development and production image
-  compose.dev.yml               # development API + PostgreSQL stack
-  compose.prod.yml              # production-style API + PostgreSQL stack
-  .env.example                  # required runtime configuration keys
-  pnpm-workspace.yaml           # pnpm workspace and build-script approvals
-  src/
-    main.ts                     # app bootstrap, CORS, sessions, validation
-    app.module.ts               # root Nest module and global guards/interceptor
-    modules/
-      auth/
-        commands/               # signup, signout, profile/password updates, reset flow
-        controllers/            # /auth routes
-        decorators/             # @Public, @Roles, @CurrentUser
-        dto/                    # auth request DTOs
-        enums/                  # RoleEnum
-        events/                 # reset-password email event handlers
-        guards/                 # auth, roles, local, Google guards
-        interfaces/             # Google profile contracts
-        queries/                # signin, profile, Google redirect, credential validation
-        serializers/            # Passport session serializer
-        strategies/             # local and Google Passport strategies
-      database/
-        migrations/             # TypeORM migrations
-        seeds/                  # starter admin/user seed data
-        abstract.entity.ts      # shared UUID/timestamp columns
-        database.module.ts      # Nest TypeORM runtime connection
-        orm.config.ts           # TypeORM CLI DataSource
-      roles/
-        commands/               # role create/update/delete handlers
-        controllers/            # /roles routes
-        dto/                    # role request DTOs
-        entities/               # Role entity
-        interfaces/             # role filters
-        queries/                # role lookup/list handlers
-      stats/
-        controllers/            # /stats routes
-        interfaces/             # stats response contracts
-        queries/                # stats query handlers
-      users/
-        commands/               # user create/update/delete/import/avatar handlers
-        common/                 # user mapping helpers
-        controllers/            # /users routes
-        dto/                    # user request DTOs
-        entities/               # User entity
-        events/                 # welcome-email event handlers
-        helpers/                # CSV helpers
-        interfaces/             # user response/filter contracts
-        queries/                # user lookup/list/export handlers
-        subscribers/            # user entity subscribers
-    shared/
-      helpers/                  # upload, CSV, email, pagination, test helpers
-      interceptors/             # response transform interceptor
-      interfaces/               # shared pagination contracts
-  uploads/                      # runtime upload target, gitignored
-```
