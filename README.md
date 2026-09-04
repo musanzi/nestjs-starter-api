@@ -135,7 +135,7 @@ Protected routes require an authenticated session. Admin routes require the `adm
 
 - `POST /auth/signup` public
 - `POST /auth/signin` public
-- `GET /auth/signin/google` public; accepts `?target=admin` to redirect admin sign-ins to `ADMIN_URI`
+- `GET /auth/signin/google` public
 - `GET /auth/google/redirect` public
 - `POST /auth/signout`
 - `GET /auth/me`
