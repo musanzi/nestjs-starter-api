@@ -12,4 +12,6 @@ When creating a feature, use the CQRS pattern: queries whenever possible, comman
 - `dto` for DTOs
 - `entities` for entities
 
-**NB:** Make sure you fully understand before you get started; if you need clarification, feel free to ask me questions as often as you like one at a time and don't generate migrations.
+### Rule
+
+Do not use another module's repository within a module; instead, create a query or command in the corresponding module and use it in the module that requires it.
